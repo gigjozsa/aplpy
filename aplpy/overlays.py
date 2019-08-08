@@ -44,7 +44,7 @@ class Scalebar(object):
 
     @auto_refresh
     def show(self, length, label=None, corner='bottom right', frame=False,
-             borderpad=0.4, pad=0.5, **kwargs):
+             borderpad=0.4, pad=0.5, sep = 5, **kwargs):
         """
         Overlay a scale bar on the image.
 
@@ -77,16 +77,23 @@ class Scalebar(object):
         self._base_settings['frame'] = frame
         self._base_settings['borderpad'] = borderpad
         self._base_settings['pad'] = pad
+        self._base_settings['sep'] = sep
 
         if isinstance(length, u.Quantity):
             length = length.to(u.degree).value
         elif isinstance(length, u.Unit):
             length = length.to(u.degree)
 
-        if self._wcs.is_celestial:
+#        if self._wcs.is_celestial:
+        if True:
             pix_scale = proj_plane_pixel_scales(self._wcs)
             sx = pix_scale[self._dimensions[0]]
             sy = pix_scale[self._dimensions[1]]
+            # Hack by Josh: if this is a PV-diagram, then CTYPE1 is offset and CDELT is in arcsec
+            if self._wcs.to_header()['CTYPE1'] == 'OFFSET':
+                sx = self._wcs.to_header()['CDELT1']/3600.
+                sy = sx
+            #
             degrees_per_pixel = np.sqrt(sx * sy)
         else:
             raise ValueError("Cannot show scalebar when WCS is not celestial")
@@ -101,9 +108,13 @@ class Scalebar(object):
         if isinstance(corner, str):
             corner = corners[corner]
 
+
+#        self._scalebar = AnchoredSizeBar(self._ax.transData, length, label,
+#                                         corner, pad=pad, borderpad=borderpad,
+#                                         sep=5, frameon=frame)
         self._scalebar = AnchoredSizeBar(self._ax.transData, length, label,
                                          corner, pad=pad, borderpad=borderpad,
-                                         sep=5, frameon=frame)
+                                         sep=sep, frameon=frame)
 
         self._ax.add_artist(self._scalebar)
 
@@ -401,7 +412,8 @@ class Beam(object):
         elif isinstance(angle, u.Unit):
             angle = angle.to(u.degree)
 
-        if self._wcs.is_celestial:
+#        if self._wcs.is_celestial:
+        if True:
             pix_scale = proj_plane_pixel_scales(self._wcs)
             sx = pix_scale[self._dimensions[0]]
             sy = pix_scale[self._dimensions[1]]

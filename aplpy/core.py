@@ -833,9 +833,9 @@ class FITSFigure(Layers, Regions):
 
     @auto_refresh
     def show_contour(self, data=None, hdu=0, layer=None, levels=5,
-                     filled=False, cmap=None, colors=None, returnlevels=False,
+                     filled=False, cmap=None, colors=None, linestyles = None, returnlevels=False,
                      convention=None, dimensions=[0, 1], slices=[],
-                     smooth=None, kernel='gauss', overlap=False, **kwargs):
+                     smooth=None, kernel='gauss', overlap=False, usepixel = False, **kwargs):
         """
         Overlay contours on the current plot.
 
@@ -957,16 +957,19 @@ class FITSFigure(Layers, Regions):
         else:
             frame = wcs_contour
 
+        if usepixel == True:
+            frame = 'pixel'
+            
         if filled:
             c = self.ax.contourf(image_contour, levels,
                                  transform=self.ax.get_transform(frame),
                                  cmap=cmap,
-                                 colors=colors, **kwargs)
+                                 colors=colors, linestyles=linestyles, **kwargs)
         else:
             c = self.ax.contour(image_contour, levels,
                                 transform=self.ax.get_transform(frame),
                                 cmap=cmap,
-                                colors=colors, **kwargs)
+                                colors=colors, linestyles = linestyles, **kwargs)
 
         if layer:
             contour_set_name = layer
