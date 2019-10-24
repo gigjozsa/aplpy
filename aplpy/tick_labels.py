@@ -110,7 +110,7 @@ class TickLabels(object):
         """
         self._ax.coords[self.x].set_ticklabel(**kwargs)
         self._ax.coords[self.y].set_ticklabel(**kwargs)
-
+        
     @auto_refresh
     def show(self):
         """

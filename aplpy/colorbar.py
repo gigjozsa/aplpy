@@ -25,7 +25,7 @@ class Colorbar(object):
     def show(self, location='right', width=0.2, pad=0.05, ticks=None,
              labels=True, log_format=False, box=None,
              box_orientation='vertical', axis_label_text=None,
-             axis_label_rotation=None, axis_label_pad=5):
+             axis_label_rotation=None, axis_label_pad=5, linewidth = 1, color = 'black', ticklength = 5):
         """
         Show a colorbar on the side of the image.
 
@@ -76,6 +76,9 @@ class Colorbar(object):
         self._base_settings['axis_label_text'] = axis_label_text
         self._base_settings['axis_label_rotation'] = axis_label_rotation
         self._base_settings['axis_label_pad'] = axis_label_pad
+        self._base_settings['color'] = color
+        self._base_settings['linewidth'] = linewidth
+        self._base_settings['ticklength'] = ticklength
 
         if self._parent.image:
 
@@ -122,6 +125,13 @@ class Colorbar(object):
             self._colorbar = self._figure.colorbar(self._parent.image, cax=self._colorbar_axes,
                                                    orientation=orientation, format=format,
                                                    ticks=ticks)
+            ### GIGJ start ###
+            self._colorbar.outline.set_linewidth(self._base_settings['linewidth'])
+            self._colorbar.outline.set_edgecolor(self._base_settings['color'])
+            self._colorbar_axes.tick_params(width = self._base_settings['linewidth'], color = self._base_settings['color'], length = self._base_settings['ticklength'])
+            ### GIGJ end ###
+            
+            #[self._colorbar_axes.spines[i].set_linewidth(13) for i in self._colorbar_axes.spines.keys()]
             if axis_label_text:
                 if axis_label_rotation:
                     self._colorbar.set_label(axis_label_text, rotation=axis_label_rotation)
@@ -133,7 +143,7 @@ class Colorbar(object):
                     tick.tick1line.set_visible(True)
                     tick.tick2line.set_visible(True)
                     tick.label1.set_visible(False)
-                    tick.label2.set_visible(labels)
+                    tick.label2.set_visible(labels)                    
                 self._colorbar_axes.yaxis.set_label_position('right')
                 self._colorbar_axes.yaxis.labelpad = axis_label_pad
             elif location == 'top':
@@ -394,15 +404,27 @@ class Colorbar(object):
         """
         Set the linewidth of the colorbar frame, in points.
         """
-        warnings.warn("This method is not functional at this time")
-        for key in self._colorbar_axes.spines:
-            self._colorbar_axes.spines[key].set_linewidth(linewidth)
+        ### GIGJ start ###
+        self._base_settings['linewidth'] = linewidth
+        self.update()
+        ### GIGJ end ###
 
     @auto_refresh
     def set_frame_color(self, color):
         """
         Set the color of the colorbar frame, in points.
         """
-        warnings.warn("This method is not functional at this time")
-        for key in self._colorbar_axes.spines:
-            self._colorbar_axes.spines[key].set_edgecolor(color)
+        ### GIGJ start ###
+        self._base_settings['color'] = color
+        self.update()
+        ### GIG end ###
+
+    ### GIGJ start ###
+    @auto_refresh
+    def set_tick_length(self, ticklength):
+        """
+        Set the tick length of the colorbar frame, in points.
+        """
+        self._base_settings['ticklength'] = ticklength
+        self.update()
+    ### GIG end ###
